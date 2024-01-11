@@ -6,6 +6,7 @@ code in DS and DE class
     1. [key pandas command](#key-pandas-command)
     2. [key datetme transformation](#key-datetme-transformation)
     3. [Assignment 1](#assignment-1)
+2. [Reference](#reference)
 
 ## 1st week
 ### key pandas command
@@ -27,3 +28,6 @@ df.merge(...)
 
 ### Assignment 1
 link [here](/assignment_1/5_PandasAssignment.ipynb)
+
+## Reference
+- [class github](https://github.com/pvateekul/2110446_DSDE_2023s2)
