@@ -23,7 +23,17 @@ code in DS and DE class
         1. [hyperparameters](#hyperparameters)
     1. [Feature selection from tree (feature importance) with shortcut](#feature-selection-from-tree-feature-importance-with-shortcut)
     1. [Linear regression](#linear-regression)
-
+1. [Week 4](#week-4)
+    1. [kNNs](#knns)
+        1. [Caution](#caution)
+    1. [GridSearchCV](#gridsearchcv)
+    1. [RandomizeSearchCV](#randomizesearchcv)
+    1. [Save & Load model](#save--load-model)
+    1. [Pipelining](#pipelining)
+    1. [Neural Network](#neural-network)
+        1. [Weight updating](#weight-updating)
+    1. [CNN](#cnn)
+        1. [example](#example)
 1. [Reference](#reference)
 
 ## 1st week
@@ -270,6 +280,136 @@ Basic solution
 - if not linear -> use **Neural Network**
 - if not normal -> take log to make it ***more*** normal
 
+## Week 4
+
+### kNNs
+- `k` : number of nearest neighbors -> to make **vote/average/miximum prob, etc.**
+- `distance_fn` : to measure distance
+
+#### Caution
+1. must be **numeric** value
+1. must **normalize** data on each axis
+
+### GridSearchCV
+
+```python
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import StratifiedKFold
+
+grid_search = GridSearchCV(estimator=...,
+                           param_grid=...,
+                           scoring=...,
+                           cv=StratifiedKFold(n_splits=5))
+grid_Ssarch.fit(...)
+
+model = grid_search.best_estimator_
+
+model.predict(...)
+```
+
+### RandomizeSearchCV
+
+- as same as `GridSearchCV` but randomize approach
+- `n_iter` : to tell the most iteration to random select.
+
+### Save & Load model
+
+```python
+import pickle
+
+# to save model
+pickle.dump(model, open('model.pkl', 'wb'))
+
+# to load model
+loaded_model = pickle.load(open('model.pkl', 'rb'))
+
+loaded_model.predict(...)
+```
+
+### Pipelining
+
+```python
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.compose import ColumnTransformer, make_column_selector
+from sklearn.pipeline import Pipeline
+
+num_pl = Pipeline(steps=[('impute', SimpleImputer(strategy='mean')),
+                         ('scale', StandardScaler())])
+
+cat_pl = Pipeline(steps=[('imput', SimpleImputer(strategy='most_freq')),
+                         ('scale', OneHotEncoder())])
+
+from sklearn.compose import ColumnTransformer
+
+col_transf = ColumnTransformer(transformers=[('num_pl', num_pl, num_cols),
+                                             ('cat_pl', cat_pl, cat_cols),
+                                             n_jobs=-1])
+
+model_pl = Pipeline(steps=[('col_trans', col_trains),
+                            'model', model])
+
+# display pipeline
+display(model_pl)
+
+# to get parameters name
+model_pl.get_params()
+```
+
+### Neural Network
+- `hidden_units`, `hidden_layers`, `lr`, `decay`, etc.
+```python
+from sklearn.neural_network import MLPClassifier, MLPRegressor
+
+# solver is equal to Optimizer
+'''
+for example 2 layer that has 100, 200 nodes
+si hidden_layer_sizes = (100, 200)
+'''
+model = MLPClassifier(hidden_layer_sizes=...,
+                      actication='relu',
+                      solver=...)
+```
+
+#### Weight updating
+1. Stochastic Gradient Descent (SGD)
+    - update weight for every single iteration(each data point)
+    - **note** not tolerate to outlier
+1. Batch Gradient Descent 
+    - train all the data and **average** gradients to calculate back prop.
+1. Mini-batch Gradient Descent
+    - group data into smaller batch and **average**  bra bra bra
+    - **note** use less memory, tolerate to outlier.
+    - aka. `batch_size`
+
+### CNN
+- kernal
+    - `filter size` : size of kernel
+    - `filters` : number od kernel
+    - `stride` : number of pixel that kernel moved
+    - `padding` : number of pixel extended
+**process** convolution layer (feature extraction) -> NN -> outcomes
+
+#### example 
+
+1. VGGNet
+    - feature extraction layer : `Conv2D(3x3)` + `Conv2D(3x3)` + `MaxPool`
+1. Inception V1/ GoogLeNet
+    - variant kernel size
+    - **Deeper and Wider**
+1. Inception V2, V3
+    - more speed
+    - **Factorize** metrix e.g. 5x5 kernal represented by 2 of 3x3 kernel, etc.
+    - use **Batch norm** to reduce *Gradient vanishing*
+1. ResNet 
+    - make **Short skip connection** then each group call *residual block*, to reduce *Gradient vanishing*
+1. Inception-ResNet
+    - make Inception go deeper.
+1. EfficientNet
+    - deeper, wider, resolution (variant size of kernel) -> **compound scaling** 
+1. EfficientNet V2
+    - smaller and faster 6x
+    - size : S, M, L, XL
 
 
 ## Reference
