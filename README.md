@@ -337,14 +337,14 @@ from sklearn.pipeline import Pipeline
 num_pl = Pipeline(steps=[('impute', SimpleImputer(strategy='mean')),
                          ('scale', StandardScaler())])
 
-cat_pl = Pipeline(steps=[('imput', SimpleImputer(strategy='most_freq')),
+cat_pl = Pipeline(steps=[('imput', SimpleImputer(strategy='most_frequent')),
                          ('scale', OneHotEncoder())])
 
 from sklearn.compose import ColumnTransformer
 
 col_transf = ColumnTransformer(transformers=[('num_pl', num_pl, num_cols),
                                              ('cat_pl', cat_pl, cat_cols),
-                                             n_jobs=-1])
+                                             n_jobs=-1], remainder='drop')
 
 model_pl = Pipeline(steps=[('col_trans', col_trains),
                             'model', model])
@@ -688,6 +688,7 @@ best_model_df = mlflow.search_runs(order_by=['metrics.metric1 DESC'], max_result
 best_model = mlflow.pytorch.load_model(best_model_df.iloc[0].artifact_uri)
 
 # MLflow UI
+!mlflow ui
 '''
 access through link http://localhost:5000
 '''
@@ -711,7 +712,7 @@ print("MLflow Tracking UI: ", ngrok_tunnel.public_url)
 1. pipeline
 1. ML flow
 
-**Example** Assignment 5-1 in MCV
+**Example** Assignment 5-1
 
 ## Reference
 - [class github](https://github.com/pvateekul/2110446_DSDE_2023s2)
