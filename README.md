@@ -569,5 +569,149 @@ Total parameters = 20,190,298
 ##### Evaluation (confusion matrix)
 ![Alt text](./assets/Effnet_Evaluation.png)
 
+## Week 5
+
+### Image task
+1. classification
+1. detection
+1. semantic segmentation
+1. panoptic segmentation
+    - segmentation + object detection
+### Model explanation
+- `GradCAM` Technique
+
+### RNN (Recurrent Nueral Network)
+- Auto*regressive* model
+- $X_t = c+\sum_i\omega X_{t-i}$
+- **input**
+    1. Current features ($X_t$)
+    1. Previous magical number ($S_{t-1}$)
+- **output**
+    1. Next state value ($X_{t+1}$)
+- caution
+    - BPTT : Back Propogation Through Time -> **Gradient Vanishing**
+
+#### LSTM (Long-short term memory)
+- avoid **Gradient Vanishing**
+- 3 parts
+    1. input gate : input $X_t$
+    1. output gate : predict $X_{t+1}$
+    1. forget gate : to make decision how much historical info. impact
+- **input**
+    1. $X_t$
+    1. short term(last $X$), long term memory
+- **output**
+    1. $X_{t+1}$
+    1. short term(last $X$), long term memory
+### GRU (Gated Recurrent Nueral Network)
+- **LSTM** which smaller
+- **input**
+    1. $C_{t-1}$
+    1. $X_t$
+- **output**
+    1. $X_{t+1}$
+
+### Attention
+- **to fix** : normal RNN can't handle long output (e.g. ~1000 words to translate) b.s. *Bottle neck issue*
+- **Main idea** : use all embedded vectors instead of one
+    - use **Attention mechanism** -> *weighed sum* which *attention score*(learnable parameters)
+        - $C_i = \sum_ja_{i,j}h_j$ which $C_i$ is context vector(like embedded vector in **RNN**)
+- **type** of attention
+    1. additive attention
+    1. multiplication attention
+    1. self-attention
+        - e.g. "It's a dog" and "It's a cat", "It" is not refer to the same meaning -> we compare ourself to other again(KV attention) -> enrich meaning
+        ![Alt text](./assets/self_attention.png)
+    1. key value attention
+        - Query : *what's we want to know*
+        - Key : index of data
+        - Value : embedded vector
+        - Scale dot-product formular : $\text{Attention}(Q,V,K) = \text{Softmax}(\frac{QK^T}{\sqrt{d_k}}V)$
+            - $\sqrt{d_k}$ to scale number with its *dimension*
+
+### Transformer
+![Alt text](./assets/transformer.png)
+- Only **Attention**, without **RNN**
+- transformer-based model
+    1. Decoder-based model : GPT
+    1. Encoder-based model : BERT
+    1. Encoder & Decoder : BART
+
+#### Adapt to Image field -> ViT (Visual Transformer)
+1. split image into smaller grid
+1. feed like a word (act like describe each grid with image)
+1. use transformer encoder side
+
+#### When to use which
+1. Text generation -> **GPT**
+1. Text classification -> **BERT**
+
+#### Oil and Gold
+- [huggingface](http://huggingface.co/)
+
+### Model monitoring
+1. ML Flow
+    - traditional ML model
+1. TensorBoard
+    - deep learning model
+1. Weights & Biases
+    - deep learning and traditional ML model
+    - required **API key**
+
+#### ML Flow (logging and monitoring)
+1. installing
+    ```bash
+    pip install mlflow --quiet --use-deprecated=legacy-resolver 
+    ```
+```python
+
+import mlflow
+
+# start logging
+local_registry = 'sqlite:///mlruns.db'
+mlflow.set_tracking_uri(local_registry)
+exp_id = mlflow.set_experiment('my_exp')
+
+# logging parameter
+mlflow.log_param('param1', 1)
+
+# logging metric
+mlflow.log_metric('metric1', 0.5)
+
+# logging model
+mlflow.pytorch.log_model(model, 'model')
+
+# search run
+best_model_df = mlflow.search_runs(order_by=['metrics.metric1 DESC'], max_results=5)
+
+# get model
+best_model = mlflow.pytorch.load_model(best_model_df.iloc[0].artifact_uri)
+
+# MLflow UI
+'''
+access through link http://localhost:5000
+'''
+!pip install pyngrok --quiet
+
+from pyngrok import ngrok
+ngrok.kill()
+
+#Setting the authtoken (optional)
+#Get your authtoken from https://ngrok.com/
+NGROK_AUTH_TOKEN = '2TsHdd1tFmtp1cSZzWaNda1Kv9l_3b6htuCHs43LHyK2YQgVH' # Enter your authtoken
+ngrok.set_auth_token(NGROK_AUTH_TOKEN)
+
+# Open an HTTPs tunnel on port 5000 for http://localhost:5000
+ngrok_tunnel = ngrok.connect(addr='5000', proto='http', bind_tls=True)
+print("MLflow Tracking UI: ", ngrok_tunnel.public_url)
+```
+
+### Exam
+1. ML
+1. pipeline
+1. ML flow
+
+**Example** Assignment 5-1 in MCV
+
 ## Reference
 - [class github](https://github.com/pvateekul/2110446_DSDE_2023s2)
