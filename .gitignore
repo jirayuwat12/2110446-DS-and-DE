@@ -170,3 +170,7 @@ mlruns/
 
 
 mlruns.db
+
+guess_session.*
+
+midterm_exam
