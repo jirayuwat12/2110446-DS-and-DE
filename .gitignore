@@ -178,3 +178,6 @@ kaggle
 submission*.csv
 
 bert_clf
+
+
+*.pem
